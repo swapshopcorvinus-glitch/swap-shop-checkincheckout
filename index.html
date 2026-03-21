@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Swap Shop TEST — Staff Check-in</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --green-pale: #D8F3DC;
+    --green-dark: #1B4332;
+    --orange: #D4572A;
+    --orange-light: #F4A261;
+    --orange-pale: #FDE8DC;
+    --gray-50: #F8F9F7;
+    --gray-100: #EEF0EC;
+    --gray-200: #D6DAD3;
+    --gray-400: #9AA396;
+    --gray-600: #5C6360;
+    --gray-900: #1A1F1C;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  header {
+    width: 100%;
+    background: var(--green-dark);
+    color: white;
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  header .label {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.12em;
+    color: var(--green-light);
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .main { width: 100%; max-width: 480px; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .mode-btn {
+    padding: 14px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray-600);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mode-btn .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    transition: background 0.2s;
+  }
+
+  .mode-btn.active-in {
+    background: var(--green-pale);
+    border-color: var(--green-light);
+    color: var(--green-dark);
+  }
+  .mode-btn.active-in .dot { background: var(--green); }
+
+  .mode-btn.active-out {
+    background: var(--orange-pale);
+    border-color: var(--orange-light);
+    color: var(--orange);
+  }
+  .mode-btn.active-out .dot { background: var(--orange); }
+
+  /* Scanner card */
+  .scanner-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+
+  #video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: #111;
+    display: none;
+  }
+
+  #video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .scan-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scan-frame {
+    width: 200px;
+    height: 200px;
+    position: relative;
+  }
+
+  .scan-frame::before, .scan-frame::after,
+  .scan-frame span::before, .scan-frame span::after {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-color: white;
+    border-style: solid;
+  }
+  .scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+  .scan-frame::after { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+  .scan-frame span::before { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+  .scan-frame span::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+  .scan-line {
+    position: absolute;
+    left: 10px; right: 10px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green-light), transparent);
+    animation: scanline 2s ease-in-out infinite;
+    top: 10px;
+  }
+
+  @keyframes scanline {
+    0% { top: 10px; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: calc(100% - 12px); opacity: 0; }
+  }
+
+  .scan-prompt {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .scan-icon-wrap {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: var(--green-pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scan-icon-wrap svg { width: 32px; height: 32px; }
+
+  .scan-prompt h2 { font-size: 16px; font-weight: 500; color: var(--gray-900); }
+  .scan-prompt p { font-size: 13px; color: var(--gray-400); line-height: 1.5; }
+
+  .scan-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .scan-btn:active { background: var(--green-dark); }
+  .scan-btn.stop { background: var(--gray-600); }
+
+  /* Manual input */
+  .manual-section {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 16px;
+  }
+
+  .manual-label {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .manual-row { display: flex; gap: 8px; }
+
+  .manual-row input {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .manual-row input:focus { border-color: var(--green-light); }
+
+  .manual-submit {
+    padding: 11px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--green);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .manual-submit:active { background: var(--green-dark); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--gray-900);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 100;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--orange); }
+
+  /* Log */
+  .log-section {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+
+  .log-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .log-header span {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    color: var(--gray-400);
+    text-transform: uppercase;
+  }
+
+  .log-count {
+    background: var(--green-pale);
+    color: var(--green-dark);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+
+  .log-empty {
+    padding: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+
+  .log-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .log-item:last-child { border-bottom: none; }
+
+  .log-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gray-600);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .log-time {
+    font-size: 12px;
+    color: var(--gray-400);
+    white-space: nowrap;
+  }
+
+  .log-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .log-badge.in { background: var(--green-pale); color: var(--green-dark); }
+  .log-badge.out { background: var(--orange-pale); color: var(--orange); }
+
+  canvas { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Staff portal</div>
+  <h1>Swap Shop TEST</h1>
+</header>
+
+<div class="main">
+
+  <div class="mode-toggle">
+    <button class="mode-btn active-in" id="btn-in" onclick="setMode('in')">
+      <span class="dot"></span> Check in
+    </button>
+    <button class="mode-btn" id="btn-out" onclick="setMode('out')">
+      <span class="dot"></span> Check out
+    </button>
+  </div>
+
+  <div class="scanner-card">
+    <div id="video-container">
+      <video id="video" playsinline autoplay muted></video>
+      <div class="scan-overlay">
+        <div class="scan-frame">
+          <span></span>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="scan-prompt" id="scan-prompt">
+      <div class="scan-icon-wrap">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="10" height="10" rx="1.5" stroke="#2D6A4F" stroke-width="2" fill="none"/>
+          <rect x="6" y="6" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="19" y="3" width="10" height="10" rx="1.5" stroke="#2D6A4F" stroke-width="2" fill="none"/>
+          <rect x="22" y="6" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="3" y="19" width="10" height="10" rx="1.5" stroke="#2D6A4F" stroke-width="2" fill="none"/>
+          <rect x="6" y="22" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="19" y="19" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="25" y="19" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="19" y="25" width="4" height="4" fill="#2D6A4F"/>
+          <rect x="25" y="25" width="4" height="4" fill="#2D6A4F"/>
+        </svg>
+      </div>
+      <h2>Scan attendee QR code</h2>
+      <p>Tap the button below to open the camera and scan an attendee's QR code.</p>
+      <button class="scan-btn" id="scan-btn" onclick="startScan()">Open camera</button>
+    </div>
+  </div>
+
+  <div class="manual-section">
+    <div class="manual-label">Manual entry</div>
+    <div class="manual-row">
+      <input type="text" id="manual-input" placeholder="Paste QR code ID here..." />
+      <button class="manual-submit" onclick="submitManual()">Log</button>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <span>Recent scans</span>
+      <span class="log-count" id="log-count">0</span>
+    </div>
+    <div id="log-list">
+      <div class="log-empty">No scans yet — scans will appear here</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="canvas"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlAfxYRV9EgYFM1bOrYsTP4nvT772eE5sxxWopH0-oXRrfS3-2_pa1QQbgHV9uaW6cmg/exec";
+  let mode = 'in';
+  let scanning = false;
+  let animFrame = null;
+  let logItems = [];
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('btn-in').className = 'mode-btn' + (m === 'in' ? ' active-in' : '');
+    document.getElementById('btn-out').className = 'mode-btn' + (m === 'out' ? ' active-out' : '');
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+  }
+
+  async function logScan(id) {
+    if (!id || id.trim() === '') { showToast('No QR code detected', 'error'); return; }
+    id = id.trim();
+    const email = id.split('-')[0] || id;
+
+    showToast('Logging ' + (mode === 'in' ? 'check-in' : 'check-out') + '...', '');
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, type: mode === 'in' ? 'Check In' : 'Check Out', email: email })
+      });
+      showToast(mode === 'in' ? 'Checked in!' : 'Checked out!', 'success');
+      addLogItem(id, mode);
+    } catch (err) {
+      showToast('Error saving — check connection', 'error');
+    }
+  }
+
+  function addLogItem(id, type) {
+    const list = document.getElementById('log-list');
+    const empty = list.querySelector('.log-empty');
+    if (empty) empty.remove();
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `
+      <span class="log-id">${id}</span>
+      <span class="log-time">${time}</span>
+      <span class="log-badge ${type}">${type === 'in' ? 'in' : 'out'}</span>
+    `;
+    list.insertBefore(item, list.firstChild);
+
+    logItems.push({ id, type, time });
+    document.getElementById('log-count').textContent = logItems.length;
+  }
+
+  async function startScan() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const video = document.getElementById('video');
+      video.srcObject = stream;
+      document.getElementById('video-container').style.display = 'block';
+      document.getElementById('scan-prompt').style.display = 'none';
+
+      const stopBtn = document.createElement('button');
+      stopBtn.className = 'scan-btn stop';
+      stopBtn.textContent = 'Stop camera';
+      stopBtn.onclick = stopScan;
+      document.querySelector('.scanner-card').appendChild(stopBtn);
+
+      scanning = true;
+      video.onloadedmetadata = () => { video.play(); tick(); };
+    } catch (err) {
+      showToast('Camera access denied', 'error');
+    }
+  }
+
+  function stopScan() {
+    scanning = false;
+    cancelAnimationFrame(animFrame);
+    const video = document.getElementById('video');
+    if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+    document.getElementById('video-container').style.display = 'none';
+    document.getElementById('scan-prompt').style.display = 'flex';
+    const stopBtn = document.querySelector('.scan-btn.stop');
+    if (stopBtn) stopBtn.remove();
+  }
+
+  function tick() {
+    if (!scanning) return;
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        stopScan();
+        logScan(code.data);
+        return;
+      }
+    }
+    animFrame = requestAnimationFrame(tick);
+  }
+
+  function submitManual() {
+    const input = document.getElementById('manual-input');
+    const val = input.value.trim();
+    if (!val) { showToast('Please enter a QR code ID', 'error'); return; }
+    logScan(val);
+    input.value = '';
+  }
+
+  document.getElementById('manual-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitManual();
+  });
+</script>
+</body>
+</html>
