@@ -56,21 +56,11 @@
     text-transform: uppercase;
   }
 
-  header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    color: white;
-    line-height: 1.2;
-  }
+  header h1 { font-size: 22px; font-weight: 600; color: white; line-height: 1.2; }
 
   .main { width: 100%; max-width: 480px; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
 
-  /* Mode toggle */
-  .mode-toggle {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+  .mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   .mode-btn {
     padding: 14px 12px;
@@ -89,28 +79,12 @@
     gap: 8px;
   }
 
-  .mode-btn .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--gray-200);
-    transition: background 0.2s;
-  }
-
-  .mode-btn.active-in {
-    background: var(--green-pale);
-    border-color: var(--green-light);
-    color: var(--green-dark);
-  }
+  .mode-btn .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-200); transition: background 0.2s; }
+  .mode-btn.active-in { background: var(--green-pale); border-color: var(--green-light); color: var(--green-dark); }
   .mode-btn.active-in .dot { background: var(--green); }
-
-  .mode-btn.active-out {
-    background: var(--orange-pale);
-    border-color: var(--orange-light);
-    color: var(--orange);
-  }
+  .mode-btn.active-out { background: var(--orange-pale); border-color: var(--orange-light); color: var(--orange); }
   .mode-btn.active-out .dot { background: var(--orange); }
 
-  /* Scanner card */
   .scanner-card {
     background: white;
     border-radius: var(--radius);
@@ -118,63 +92,8 @@
     overflow: hidden;
   }
 
-  #video-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-    background: #111;
-    display: none;
-  }
-
-  #video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .scan-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .scan-frame {
-    width: 200px;
-    height: 200px;
-    position: relative;
-  }
-
-  .scan-frame::before, .scan-frame::after,
-  .scan-frame span::before, .scan-frame span::after {
-    content: '';
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    border-color: white;
-    border-style: solid;
-  }
-  .scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-  .scan-frame::after { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
-  .scan-frame span::before { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
-  .scan-frame span::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
-
-  .scan-line {
-    position: absolute;
-    left: 10px; right: 10px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--green-light), transparent);
-    animation: scanline 2s ease-in-out infinite;
-    top: 10px;
-  }
-
-  @keyframes scanline {
-    0% { top: 10px; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { top: calc(100% - 12px); opacity: 0; }
-  }
+  #reader { width: 100%; display: none; }
+  #reader__scan_region img { display: none !important; }
 
   .scan-prompt {
     padding: 24px;
@@ -195,7 +114,6 @@
   }
 
   .scan-icon-wrap svg { width: 32px; height: 32px; }
-
   .scan-prompt h2 { font-size: 16px; font-weight: 500; color: var(--gray-900); }
   .scan-prompt p { font-size: 13px; color: var(--gray-400); line-height: 1.5; }
 
@@ -213,9 +131,20 @@
     transition: background 0.2s;
   }
   .scan-btn:active { background: var(--green-dark); }
-  .scan-btn.stop { background: var(--gray-600); }
 
-  /* Manual input */
+  .stop-btn {
+    padding: 12px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: none;
+    width: 100%;
+  }
+
   .manual-section {
     background: white;
     border-radius: var(--radius);
@@ -259,11 +188,9 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s;
   }
   .manual-submit:active { background: var(--green-dark); }
 
-  /* Toast */
   .toast {
     position: fixed;
     top: 80px;
@@ -286,7 +213,6 @@
   .toast.success { background: var(--green); }
   .toast.error { background: var(--orange); }
 
-  /* Log */
   .log-section {
     background: white;
     border-radius: var(--radius);
@@ -320,12 +246,7 @@
     font-weight: 500;
   }
 
-  .log-empty {
-    padding: 24px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--gray-400);
-  }
+  .log-empty { padding: 24px; text-align: center; font-size: 13px; color: var(--gray-400); }
 
   .log-item {
     padding: 12px 16px;
@@ -343,34 +264,11 @@
   }
 
   .log-item:last-child { border-bottom: none; }
-
-  .log-id {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--gray-600);
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .log-time {
-    font-size: 12px;
-    color: var(--gray-400);
-    white-space: nowrap;
-  }
-
-  .log-badge {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
+  .log-id { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gray-600); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .log-time { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+  .log-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
   .log-badge.in { background: var(--green-pale); color: var(--green-dark); }
   .log-badge.out { background: var(--orange-pale); color: var(--orange); }
-
-  canvas { display: none; }
 </style>
 </head>
 <body>
@@ -392,15 +290,7 @@
   </div>
 
   <div class="scanner-card">
-    <div id="video-container">
-      <video id="video" playsinline autoplay muted></video>
-      <div class="scan-overlay">
-        <div class="scan-frame">
-          <span></span>
-          <div class="scan-line"></div>
-        </div>
-      </div>
-    </div>
+    <div id="reader"></div>
     <div class="scan-prompt" id="scan-prompt">
       <div class="scan-icon-wrap">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -418,8 +308,9 @@
       </div>
       <h2>Scan attendee QR code</h2>
       <p>Tap the button below to open the camera and scan an attendee's QR code.</p>
-      <button class="scan-btn" id="scan-btn" onclick="startScan()">Open camera</button>
+      <button class="scan-btn" onclick="startScan()">Open camera</button>
     </div>
+    <button class="stop-btn" id="stop-btn" onclick="stopScan()">Stop camera</button>
   </div>
 
   <div class="manual-section">
@@ -443,15 +334,15 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<canvas id="canvas"></canvas>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlAfxYRV9EgYFM1bOrYsTP4nvT772eE5sxxWopH0-oXRrfS3-2_pa1QQbgHV9uaW6cmg/exec";
   let mode = 'in';
-  let scanning = false;
-  let animFrame = null;
+  let scanner = null;
   let logItems = [];
+  let lastScanned = '';
+  let lastScannedTime = 0;
 
   function setMode(m) {
     mode = m;
@@ -467,10 +358,15 @@
   }
 
   async function logScan(id) {
-    if (!id || id.trim() === '') { showToast('No QR code detected', 'error'); return; }
+    if (!id || id.trim() === '') return;
     id = id.trim();
-    const email = id.split('-')[0] || id;
 
+    const now = Date.now();
+    if (id === lastScanned && now - lastScannedTime < 3000) return;
+    lastScanned = id;
+    lastScannedTime = now;
+
+    const email = id.split('-')[0] || id;
     showToast('Logging ' + (mode === 'in' ? 'check-in' : 'check-out') + '...', '');
 
     try {
@@ -503,61 +399,41 @@
       <span class="log-badge ${type}">${type === 'in' ? 'in' : 'out'}</span>
     `;
     list.insertBefore(item, list.firstChild);
-
     logItems.push({ id, type, time });
     document.getElementById('log-count').textContent = logItems.length;
   }
 
-  async function startScan() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      const video = document.getElementById('video');
-      video.srcObject = stream;
-      document.getElementById('video-container').style.display = 'block';
-      document.getElementById('scan-prompt').style.display = 'none';
+  function startScan() {
+    document.getElementById('scan-prompt').style.display = 'none';
+    document.getElementById('reader').style.display = 'block';
+    document.getElementById('stop-btn').style.display = 'block';
 
-      const stopBtn = document.createElement('button');
-      stopBtn.className = 'scan-btn stop';
-      stopBtn.textContent = 'Stop camera';
-      stopBtn.onclick = stopScan;
-      document.querySelector('.scanner-card').appendChild(stopBtn);
-
-      scanning = true;
-      video.onloadedmetadata = () => { video.play(); tick(); };
-    } catch (err) {
+    scanner = new Html5Qrcode("reader");
+    scanner.start(
+      { facingMode: "environment" },
+      {
+        fps: 20,
+        qrbox: { width: 280, height: 280 },
+        aspectRatio: 1.0,
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        rememberLastUsedCamera: true,
+        showTorchButtonIfSupported: true
+      },
+      (decodedText) => { logScan(decodedText); },
+      () => {}
+    ).catch(() => {
       showToast('Camera access denied', 'error');
-    }
+      stopScan();
+    });
   }
 
   function stopScan() {
-    scanning = false;
-    cancelAnimationFrame(animFrame);
-    const video = document.getElementById('video');
-    if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-    document.getElementById('video-container').style.display = 'none';
-    document.getElementById('scan-prompt').style.display = 'flex';
-    const stopBtn = document.querySelector('.scan-btn.stop');
-    if (stopBtn) stopBtn.remove();
-  }
-
-  function tick() {
-    if (!scanning) return;
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        stopScan();
-        logScan(code.data);
-        return;
-      }
+    if (scanner) {
+      scanner.stop().then(() => { scanner.clear(); scanner = null; }).catch(() => {});
     }
-    animFrame = requestAnimationFrame(tick);
+    document.getElementById('reader').style.display = 'none';
+    document.getElementById('scan-prompt').style.display = 'flex';
+    document.getElementById('stop-btn').style.display = 'none';
   }
 
   function submitManual() {
